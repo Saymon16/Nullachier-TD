@@ -5,34 +5,44 @@ public class Enemy : MonoBehaviour
 {
 
 	public int health = 5;
+	public float speed = 1.5f;
+	public Turret_Basic[] turrets;
 
+	Color mycolor;
+	Renderer myrenderer;
 
 
 	// Use this for initialization
 	void Start ()
 	{
-	
+		myrenderer = transform.GetComponent<Renderer> ();
+		mycolor = myrenderer.material.color;
+		turrets = GameObject.FindObjectsOfType<Turret_Basic> ();
 	}
 	
 	// Update is called once per frame
 	void Update ()
 	{
-		if (health <= 0) {
-			
+		myrenderer.material.color = Color.Lerp (myrenderer.material.color, mycolor, Time.deltaTime * 3);
+
+		transform.Translate (Vector3.forward * Time.deltaTime * speed);
+
+		if (health <= 0) {			
 			Die ();
 		}
 	}
 
-	void Die ()
-	{
-		Transform t = null;
-		Die (t);
-	}
 
-	void Die (Transform p)
-	{
-		if (p != null) {
-			p.GetComponent<Turret_Basic> ().RemoveEnemy (this.transform);
+
+		
+	
+
+
+
+	void Die ()
+	{		
+		foreach (Turret_Basic t in turrets) {
+			t.RemoveEnemy (this.transform);
 		}
 		Destroy (gameObject);
 	}
@@ -42,9 +52,11 @@ public class Enemy : MonoBehaviour
 		if (other.gameObject.tag == "Projectile") {			
 			Projectile_Cannon p = other.GetComponent<Projectile_Cannon> ();
 			health -= p.damage;
+			myrenderer.material.color = Color.red;
 			if (health <= 0) {				
-				Die (p.origin);
+				Die ();
 			}
+			Destroy (p.gameObject);
 		}
 	}
 }

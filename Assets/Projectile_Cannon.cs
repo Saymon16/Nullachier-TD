@@ -4,8 +4,8 @@ using System.Collections;
 public class Projectile_Cannon : MonoBehaviour
 {
 
-	public float speed = 10f;
-	public float range = 10f;
+	public float speed = 50f;
+	public float range = 12f;
 	public int damage = 1;
 	public Transform origin;
 
@@ -20,15 +20,5 @@ public class Projectile_Cannon : MonoBehaviour
 			Destroy (gameObject);
 		}
 	}
-
-	void OnTriggerEnter (Collider other)
-	{				
-		if (other.gameObject.tag == "Enemy") {
-			Enemy e = other.GetComponent<Enemy> ();
-			e.health -= damage;
-		}
-	}
-
-
 }
 
