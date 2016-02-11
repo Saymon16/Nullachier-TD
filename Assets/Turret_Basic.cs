@@ -13,9 +13,7 @@ public class Turret_Basic : MonoBehaviour
 	{
 		First,
 		Random,
-		Last,
-		MostHealth,
-		LeastHealth}
+		Last}
 
 	;
 
@@ -32,7 +30,6 @@ public class Turret_Basic : MonoBehaviour
 	public List<Transform> enemies;
 	public Transform[] muzzle;
 	public Transform ball;
-
 
 	Vector3 anticipatedPos;
 
@@ -58,12 +55,13 @@ public class Turret_Basic : MonoBehaviour
 	{
 
 		displaymode.text = mode.ToString ();
+		Vector3 rot = Vector3.zero;	
 
 		if (target != null) {
 			
 			if (Time.time >= nextMoveTime) {
 				
-				CalculateAimPos ((target.position + (anticipatedPos / 5f)) - transform.position);
+				CalculateAimPos (target.position - transform.position); //+ anticipatedPos / 5f
 				ball.rotation = Quaternion.Lerp (ball.rotation, desiredRot, Time.deltaTime * turnSpeed);
 			}
 			if (Time.time >= nextFireTime) {
@@ -102,18 +100,43 @@ public class Turret_Basic : MonoBehaviour
 		}
 	}
 
+	public void ScrollMode ()
+	{
+		switch (mode) {
+		case Sort.First:
+			mode = Sort.Last;
+			break;		
+		case Sort.Last:
+			mode = Sort.Random;
+			break;
+		case Sort.Random:
+			mode = Sort.First;
+			break;			
+		}
+	}
+
 	void ChooseNextTarget ()
 	{
 		nextFireTime = Time.time + reloadTime * 0.5f;
 		if (mode == Sort.Random) {
 			if (enemies.Count > 0) {
-				target = enemies [Random.Range (0, enemies.Count - 1)];
+				int r = Random.Range (0, enemies.Count - 1);
+				if (enemies [r] == null) {
+					enemies.RemoveAt (r);
+					ChooseNextTarget ();
+				}
+				target = enemies [r];
 			} else {
 				target = null;
 			}
 		}
 		if (mode == Sort.First) {
 			if (enemies.Count > 0) {
+
+				if (enemies [0] == null) {
+					enemies.RemoveAt (0);
+					ChooseNextTarget ();
+				}
 				target = enemies [0];
 			} else {
 				target = null;
@@ -121,13 +144,17 @@ public class Turret_Basic : MonoBehaviour
 		}
 		if (mode == Sort.Last) {
 			if (enemies.Count > 0) {
-				
+
+				if (enemies [enemies.Count - 1] == null) {
+					enemies.RemoveAt (enemies.Count - 1);
+					ChooseNextTarget ();
+				}
 				target = enemies [enemies.Count - 1];
 			} else {
 				target = null;
 			}
 		}
-		if (mode == Sort.MostHealth) {
+		/*if (mode == Sort.MostHealth) {
 			if (enemies.Count > 0) {
 				int max = enemies [0].GetComponent<Enemy> ().health;
 				int index = 0;
@@ -166,7 +193,7 @@ public class Turret_Basic : MonoBehaviour
 			} else {
 				target = null;
 			}
-		}
+		}*/
 	}
 
 	void CalculateAimPos (Vector3 pos)

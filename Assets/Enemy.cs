@@ -1,12 +1,13 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class Enemy : MonoBehaviour
 {
 
 	public int health = 5;
 	public float speed = 1.5f;
-	public Turret_Basic[] turrets;
+	public List<Turret_Basic> turrets;
 
 	Color mycolor;
 	Renderer myrenderer;
@@ -17,7 +18,10 @@ public class Enemy : MonoBehaviour
 	{
 		myrenderer = transform.GetComponent<Renderer> ();
 		mycolor = myrenderer.material.color;
-		turrets = GameObject.FindObjectsOfType<Turret_Basic> ();
+		Turret_Basic[] tmp = GameObject.FindObjectsOfType<Turret_Basic> ();
+		foreach (Turret_Basic t in tmp) {
+			turrets.Add (t);
+		}
 	}
 	
 	// Update is called once per frame
@@ -31,13 +35,6 @@ public class Enemy : MonoBehaviour
 			Die ();
 		}
 	}
-
-
-
-		
-	
-
-
 
 	void Die ()
 	{		
