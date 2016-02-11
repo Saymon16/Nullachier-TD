@@ -11,7 +11,8 @@ public class Grid_Manager : MonoBehaviour
 
 	public List<Enemy> allEnemies;
 	public List<Turret_Basic> allTurrets;
-	public GameObject turret;
+	public GameObject turret_cannon;
+	public GameObject turret_missile;
 
 
 	public Material normal;
@@ -50,13 +51,24 @@ public class Grid_Manager : MonoBehaviour
 
 		if (Input.GetMouseButtonDown (0) && lastHitObj != null && lastHitObj.tag == "Placement_Plane_Open") {
 			lastHitObj.tag = "Placement_Plane_Closed";
-			GameObject g = Instantiate (turret, lastHitObj.transform.position, Quaternion.identity) as GameObject;
+			GameObject g = Instantiate (turret_cannon, lastHitObj.transform.position, Quaternion.identity) as GameObject;
 			Turret_Basic t = g.GetComponent<Turret_Basic> ();
 			t.mode = Turret_Basic.Sort.Last;
 			allTurrets.Add (t);
 			RefreshBoard ();
 			t.transform.GetChild (0).transform.rotation = Quaternion.Euler (0, Random.Range (0, 359), 0);
 		}
+
+		if (Input.GetMouseButtonDown (1) && lastHitObj != null && lastHitObj.tag == "Placement_Plane_Open") {
+			lastHitObj.tag = "Placement_Plane_Closed";
+			GameObject g = Instantiate (turret_missile, lastHitObj.transform.position, Quaternion.identity) as GameObject;
+			Turret_Basic t = g.GetComponent<Turret_Basic> ();
+			t.mode = Turret_Basic.Sort.Last;
+			allTurrets.Add (t);
+			RefreshBoard ();
+			t.transform.GetChild (0).transform.rotation = Quaternion.Euler (0, Random.Range (0, 359), 0);
+		}
+
 		if (Input.GetMouseButtonDown (0) && lastHitObj != null && lastHitObj.tag == "Placement_Plane_Closed") {
 			Collider[] c = Physics.OverlapSphere (lastHitObj.transform.position, 0.02f);
 			foreach (Collider cs in c) {				

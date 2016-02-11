@@ -28,7 +28,7 @@ public class Spawner : MonoBehaviour
 
 	void Update ()
 	{
-		if (Input.GetMouseButtonDown (1)) {
+		if (Input.GetMouseButtonDown (1) && gm.lastHitObj == null) {
 			SpawnWave (5);
 		}
 	}

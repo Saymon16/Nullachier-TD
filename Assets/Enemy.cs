@@ -44,11 +44,35 @@ public class Enemy : MonoBehaviour
 		Destroy (gameObject);
 	}
 
+	void AOE (float radius, float damage)
+	{
+		Collider[] cols = Physics.OverlapSphere (transform.position, radius + 1);
+		foreach (Collider col in cols) {
+			if (col.gameObject.tag == "Enemy") {
+				if (Vector3.Distance (col.transform.position, transform.position) <= radius) {
+					Enemy e = col.GetComponent<Enemy> ();
+					e.health -= Mathf.RoundToInt (damage);
+					e.myrenderer.material.color = Color.red;
+				}
+			}
+		}
+	}
+
 	void OnTriggerEnter (Collider other)
 	{			
-		if (other.gameObject.tag == "Projectile") {			
+		if (other.gameObject.tag == "Projectile_Cannon") {			
 			Projectile_Cannon p = other.GetComponent<Projectile_Cannon> ();
 			health -= p.damage;
+			myrenderer.material.color = Color.red;
+			if (health <= 0) {				
+				Die ();
+			}
+			Destroy (p.gameObject);
+		}
+		if (other.gameObject.tag == "Projectile_Missile") {			
+			Projectile_Missile p = other.GetComponent<Projectile_Missile> ();
+			health -= p.damage;
+			AOE (3, p.damage / 2);
 			myrenderer.material.color = Color.red;
 			if (health <= 0) {				
 				Die ();

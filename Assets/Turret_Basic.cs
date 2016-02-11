@@ -17,8 +17,16 @@ public class Turret_Basic : MonoBehaviour
 
 	;
 
+	public enum Type
+	{
+		Cannon,
+		Missile}
+
+	;
+
 	public Text displaymode;
 	public Sort mode;
+	public Type type_tourelle;
 	public GameObject projectile;
 	public float reloadTime = 1f;
 	public float turnSpeed = 5f;
@@ -26,16 +34,16 @@ public class Turret_Basic : MonoBehaviour
 	//public GameObject muzzleFlash;
 	public float errorAmount = .001f;
 	public Transform target;
-	public Vector3 targetLastPos;
+	//public Vector3 targetLastPos;
 	public List<Transform> enemies;
 	public Transform[] muzzle;
 	public Transform ball;
 
-	Vector3 anticipatedPos;
+	//Vector3 anticipatedPos;
 
 	float nextFireTime;
 	float nextMoveTime;
-	float nextEvaluate;
+	//float nextEvaluate;
 	Quaternion desiredRot;
 	float aimError;
 
@@ -46,16 +54,15 @@ public class Turret_Basic : MonoBehaviour
 	{
 		
 		nextFireTime = Time.time + reloadTime;
-		targetLastPos = Vector3.zero;
+		/*targetLastPos = Vector3.zero;
 		nextEvaluate = Time.time + .1f;
-		anticipatedPos = Vector3.zero;
+		anticipatedPos = Vector3.zero;*/
 	}
 
 	void Update ()
 	{
 
-		displaymode.text = mode.ToString ();
-		Vector3 rot = Vector3.zero;	
+		displaymode.text = mode.ToString ();	
 
 		if (target != null) {
 			
@@ -67,11 +74,11 @@ public class Turret_Basic : MonoBehaviour
 			if (Time.time >= nextFireTime) {
 				FireProjectile ();
 			}
-			if (Time.time >= nextEvaluate) {
+			/*if (Time.time >= nextEvaluate) {
 				nextEvaluate = Time.time + .1f; 
-				anticipatedPos = (target.position - targetLastPos) * (.1f * Vector3.Distance (transform.position, target.position));
-				targetLastPos = target.position;
-			}
+			anticipatedPos = (target.position - targetLastPos) * (.1f * Vector3.Distance (transform.position, target.position));
+			targetLastPos = target.position;
+			}*/
 
 
 		} else {
@@ -222,7 +229,14 @@ public class Turret_Basic : MonoBehaviour
 		CalculateAimError ();
 		foreach (Transform m in muzzle) {
 			GameObject p =	Instantiate (projectile, m.position, m.rotation)as GameObject;
-			p.GetComponent<Projectile_Cannon> ().origin = this.transform;
+			if (type_tourelle == Type.Cannon) {
+				p.GetComponent<Projectile_Cannon> ().origin = this.transform;
+			}
+			if (type_tourelle == Type.Missile) {
+				Projectile_Missile pm = p.GetComponent<Projectile_Missile> ();
+				pm.origin = this.transform;
+				pm.target = target;
+			}
 			//Instantiate (muzzleFlash, m.position, m.rotation);
 		}
 	}
