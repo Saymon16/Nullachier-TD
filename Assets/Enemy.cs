@@ -9,28 +9,51 @@ public class Enemy : MonoBehaviour
 	public float speed = 1.5f;
 	public List<Turret_Basic> turrets;
 
-	Color mycolor;
-	Renderer myrenderer;
+	public Waypoint target;
 
+	Grid_Manager gm;
+	public Color mycolor;
+	Renderer myrenderer;
+	public float waitBeforeGo;
 
 	// Use this for initialization
 	void Start ()
 	{
+		gm = GameObject.FindObjectOfType<Grid_Manager> ();
 		myrenderer = transform.GetComponent<Renderer> ();
-		mycolor = myrenderer.material.color;
+		myrenderer.material.color	= mycolor;
 		Turret_Basic[] tmp = GameObject.FindObjectsOfType<Turret_Basic> ();
 		foreach (Turret_Basic t in tmp) {
 			turrets.Add (t);
+		}
+
+		Waypoint[] waypoints = GameObject.FindObjectsOfType<Waypoint> ();
+		float dist = Mathf.Infinity;
+		foreach (Waypoint w in waypoints) {
+			if (w.isFirst) {
+				float d = Vector3.Distance (w.transform.position, transform.position);
+				if (d < dist) {
+					target = w;
+					dist = d;
+				}
+			}
 		}
 	}
 	
 	// Update is called once per frame
 	void Update ()
 	{
-		myrenderer.material.color = Color.Lerp (myrenderer.material.color, mycolor, Time.deltaTime * 3);
+		if (Time.time > waitBeforeGo) {
+			myrenderer.material.color = Color.Lerp (myrenderer.material.color, mycolor, Time.deltaTime * 3);
+			if (target != null) {
 
-		transform.Translate (Vector3.forward * Time.deltaTime * speed);
+				Vector3 t = new Vector3 (target.transform.position.x, transform.position.y, target.transform.position.z);
+				transform.rotation = Quaternion.LookRotation (t - transform.position);
+			}
+			transform.Translate (Vector3.forward * Time.deltaTime * speed);
 
+
+		}
 		if (health <= 0) {			
 			Die ();
 		}
@@ -41,7 +64,9 @@ public class Enemy : MonoBehaviour
 		foreach (Turret_Basic t in turrets) {
 			t.RemoveEnemy (this.transform);
 		}
+		gm.allEnemies.Remove (this);
 		Destroy (gameObject);
+
 	}
 
 	void AOE (float radius, float damage)
@@ -56,6 +81,12 @@ public class Enemy : MonoBehaviour
 				}
 			}
 		}
+	}
+
+	public void HasReachedEnd ()
+	{
+		Destroy (gameObject);
+		//loose lives
 	}
 
 	void OnTriggerEnter (Collider other)

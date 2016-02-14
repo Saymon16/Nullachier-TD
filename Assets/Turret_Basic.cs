@@ -28,8 +28,11 @@ public class Turret_Basic : MonoBehaviour
 	public Sort mode;
 	public Type type_tourelle;
 	public GameObject projectile;
+	public GameObject muzzleFlash;
+
 	public float reloadTime = 1f;
 	public float turnSpeed = 5f;
+
 	public float firePauseTime = .25f;
 	//public GameObject muzzleFlash;
 	public float errorAmount = .001f;
@@ -230,14 +233,16 @@ public class Turret_Basic : MonoBehaviour
 		foreach (Transform m in muzzle) {
 			GameObject p =	Instantiate (projectile, m.position, m.rotation)as GameObject;
 			if (type_tourelle == Type.Cannon) {
-				p.GetComponent<Projectile_Cannon> ().origin = this.transform;
+				Projectile_Cannon pc = p.GetComponent<Projectile_Cannon> ();
+				pc.origin = this.transform;
+				pc.target = target;
 			}
 			if (type_tourelle == Type.Missile) {
 				Projectile_Missile pm = p.GetComponent<Projectile_Missile> ();
 				pm.origin = this.transform;
 				pm.target = target;
 			}
-			//Instantiate (muzzleFlash, m.position, m.rotation);
+			Instantiate (muzzleFlash, m.position, m.rotation);
 		}
 	}
 
